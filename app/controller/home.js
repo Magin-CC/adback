@@ -39,8 +39,8 @@ class HomeController extends Controller {
     const target = path.join(this.config.baseDir, 'app/public', filename);
     const writeStream = fs.createWriteStream(target);
     await pump(stream, writeStream);
-    const size = this.ctx.helper.getImageSize(filename);
-    this.ctx.body = { status: 0, message: { filename, size } };
+    // const size = this.ctx.helper.getImageSize(filename);
+    this.ctx.body = { status: 0, message: filename /** size */ };
   }
   async script() {
     const { ctx, service } = this;
