@@ -34,7 +34,7 @@ module.exports = app => {
     updater: { type: mongoose.Schema.ObjectId, ref: 'User' },
     updateDate: { type: Date },
     createDate: { type: Date },
-    visited: { type: Number, default: 0 },
+    visited: { type: Number, default: 0 }, // 弃用， 访问记录在订单中
   });
   return mongoose.model('Ad', AdSchema);
 };

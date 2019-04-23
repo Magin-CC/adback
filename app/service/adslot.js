@@ -41,7 +41,21 @@ class AdslotService extends Service {
       .populate('updater', 'username')
       .populate('site', 'name')
       .populate('ads.ads.ad', 'name')
-      .populate('defaultAd', 'name');
+      .populate('defaultAd', 'name')
+      .lean();
+    sites.forEach((v, k) => {
+      if (!v.size) {
+        sites[k].size = {
+          imgHeight: 0,
+          imgHeightOmg: true,
+          imgWidth: 0,
+          imgWidthOmg: true,
+          textMax: 0,
+          textMin: 0,
+          textOmg: true,
+        };
+      }
+    });
     const count = await app.model.Adslot.count(query);
     return { count, data: sites };
   }
@@ -66,6 +80,22 @@ class AdslotService extends Service {
     return data;
   }
 
+  async setAd(_id, order, adId, slot, startDate, endDate) {
+    const res = await this.app.model.Adslot.update({ _id }, {
+      $set: {
+        updater: this.ctx.session.user._id,
+      },
+      $push: {
+        [`ads.${slot}.ads`]: {
+          ad: adId,
+          startDate,
+          endDate,
+          order,
+        },
+      },
+    });
+    return res;
+  }
 }
 
 module.exports = AdslotService;

@@ -37,9 +37,25 @@ module.exports = appInfo => {
   };
   config.multipart = {
     fileSize: '10000mb',
+    whitelist: [
+      '.pdf',
+      '.jpg', '.jpeg', // image/jpeg
+      '.png', // image/png, image/x-png
+      '.gif', // image/gif
+      '.bmp', // image/bmp
+      '.wbmp', // image/vnd.wap.wbmp
+    ],
   };
   config.static = {
     prefix: '/ad/public',
   };
+
+  config.email = {
+    username: 'wlyyconfluence@163.com',
+    password: 'wlyy123456',
+    host: 'smtp.163.com',
+    sender: 'wlyyconfluence@163.com',
+  };
+
   return config;
 };

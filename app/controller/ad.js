@@ -1,9 +1,11 @@
 'use strict';
 
 const Controller = require('egg').Controller;
+const _ = require('lodash');
 class AdController extends Controller {
   async create() {
-    const ctx = this.ctx;
+    const { ctx } = this;
+
     // 校验 `ctx.request.body` 是否符合我们预期的格式
     // 如果参数校验未通过，将会抛出一个 status = 422 的异常
     // 调用 service 创建一个 topic
@@ -37,7 +39,38 @@ class AdController extends Controller {
 
   async index() {
     const { ctx } = this;
-    const detail = await ctx.service.ad.list(ctx.request.query);
+    const { imgHeight, imgHeightOmg, imgWidth, imgWidthOmg, textMin, textMax, textOmg, type } = ctx.query;
+    const query = _.clone(ctx.request.query);
+    if (+imgHeight && (imgHeightOmg === 'false')) {
+      query.imgHeight = imgHeight;
+    } else {
+      delete query.imgHeight;
+      delete query.imgHeightOmg;
+    }
+
+    if (+imgWidth && (imgWidthOmg === 'false')) {
+      query.imgWidth = imgWidth;
+    } else {
+      delete query.imgWidth;
+      delete query.imgHeightOmg;
+    }
+
+
+    if (type && (type !== 'mixin')) {
+      query.type = type;
+    } else {
+      delete query.type;
+    }
+
+    if (textOmg === 'false') {
+      query.textMin = textMin;
+      query.textMax = textMax;
+    } else {
+      delete query.textMin;
+      delete query.textMax;
+    }
+
+    const detail = await ctx.service.ad.list(query);
     ctx.body = {
       status: 0,
       detail,

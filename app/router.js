@@ -19,6 +19,9 @@ module.exports = app => {
   app.router.resources('ad', '/ad/api/v1/ad', authCheck, app.controller.ad);
   app.router.resources('adslot', '/ad/api/v1/adslot', authCheck, app.controller.adslot);
   app.router.resources('visit', '/ad/api/v1/visit', authCheck, app.controller.visit);
+  app.router.resources('order', '/ad/api/v1/order', authCheck, app.controller.order);
+  app.router.resources('contract', '/ad/api/v1/contract', authCheck, app.controller.contract);
+  app.router.post('/ad/api/v1/contract_create', controller.contract._create);
   app.router.get('total', '/ad/api/v1/total', authCheck, app.controller.home.total);
   // app.router.get('script', '/ad/:id', )
 };

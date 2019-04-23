@@ -8,7 +8,7 @@ module.exports = app => {
     ip: String,
     origin: String,
     createDate: Date,
-    ad: { type: mongoose.Schema.ObjectId, ref: 'Ad' },
+    order: { type: mongoose.Schema.ObjectId, ref: 'Order' },
     site: { type: mongoose.Schema.ObjectId, ref: 'Site' },
   });
   return mongoose.model('Visit', VisitSchema);

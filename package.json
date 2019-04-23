@@ -4,16 +4,20 @@
   "description": "adsystem",
   "private": true,
   "dependencies": {
+    "baidu-aip-sdk": "^2.3.9",
     "egg": "^2.2.1",
     "egg-alinode": "^2.0.1",
+    "egg-mail": "^1.0.10",
     "egg-mongoose": "^3.1.0",
     "egg-scripts": "^2.9.1",
     "egg-validate": "^2.0.0",
+    "gm": "^1.23.1",
     "image-size": "^0.6.3",
     "images": "^3.0.1",
     "isnumber": "^1.0.0",
     "lodash": "^4.17.10",
-    "mz-modules": "^2.1.0"
+    "mz-modules": "^2.1.0",
+    "stream-wormhole": "^1.1.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",

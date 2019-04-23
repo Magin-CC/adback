@@ -10,4 +10,7 @@ exports.mongoose = {
   enable: true,
   package: 'egg-mongoose',
 };
-
+exports.email = {
+  enable: true,
+  package: 'egg-mail',
+};

@@ -8,11 +8,21 @@ module.exports = app => {
     isDefault: { type: Boolean, default: false },
     startDate: Date,
     endDate: Date,
+    order: { type: mongoose.Schema.ObjectId, ref: 'Order' },
   });
-  const slotSchema = new Schema({
+  const SlotSchema = new Schema({
     index: Number,
     name: String,
     ads: [ AdSchema ],
+  });
+  const SizeSchema = new Schema({
+    imgHeight: Number,
+    imgHeightOmg: Boolean,
+    imgWidth: Number,
+    imgWidthOmg: Boolean,
+    textMax: Number,
+    textMin: Number,
+    textOmg: Boolean,
   });
   const AdslotSchema = new Schema({
     name: { type: String, unique: true },
@@ -20,12 +30,14 @@ module.exports = app => {
     updater: { type: mongoose.Schema.ObjectId, ref: 'User' },
     site: { type: mongoose.Schema.ObjectId, ref: 'Site' },
     type: { type: String }, // image, text, mixin
-    ads: [ slotSchema ],
+    ads: [ SlotSchema ],
     defaultAd: { type: mongoose.Schema.ObjectId, ref: 'Ad' },
     script: { type: String },
     scriptHistory: { type: String },
     createDate: { type: Date },
     description: { type: String },
+    size: SizeSchema,
   });
+  AdslotSchema.set('toObject', { getters: true });
   return mongoose.model('Adslot', AdslotSchema);
 };

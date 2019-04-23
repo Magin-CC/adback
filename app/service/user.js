@@ -70,6 +70,11 @@ class UserService extends Service {
     const user = await app.model.User.updateOne({ _id: id }, query);
     return user;
   }
+
+  async listAdmin() {
+    const res = await this.app.model.User.find({ role: 2 });
+    return res;
+  }
 }
 
 module.exports = UserService;

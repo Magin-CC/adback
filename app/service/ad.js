@@ -35,6 +35,12 @@ class AdService extends Service {
     if (params.site) {
       query.site = params.site;
     }
+    if (params.type && params.type !== 'mixin') {
+      query.type = params.type;
+    }
+    if (params.imgHeight && (params.type !== 'text')) {
+      query['imageSize.height'] = params.imgHeight;
+    }
     const sites = await app.model.Ad.find(query).skip(skip).limit(limit)
       .sort({ [sort]: -1 })
       .populate('operator', 'username')
@@ -43,7 +49,7 @@ class AdService extends Service {
       if (!v.imageSize && v.image && v.image.thumbUrl) {
         try {
           v.imageSize = ctx.helper.getImageSize(v.image.thumbUrl.split('/').slice(-1)[0]);
-        } catch (e) { 
+        } catch (e) {
           console.log('cant find img');
         }
       }

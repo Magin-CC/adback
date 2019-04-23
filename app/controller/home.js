@@ -5,9 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
 const pump = require('mz-modules/pump');
-const imageSize = require('image-size');
-
 const _ = require('lodash');
+
 const loginRule = {
   username: 'string',
   password: 'string',
@@ -54,10 +53,13 @@ class HomeController extends Controller {
         return '';
       }
       let showAd = {};
+      let showOrderId = '';
       const now = new Date();
-      adSlotItem.ads.forEach((v, k) => {
+      _.forEach(adSlotItem.ads, v => {
         if (now > v.startDate && now < v.endDate && (!showAd._id) && v.ad) {
           showAd = v.ad;
+          showOrderId = v.order;
+          return false;
         }
       });
       // 不存在广告，使用默认广告
@@ -65,15 +67,15 @@ class HomeController extends Controller {
         showAd = adslot.defaultAd;
       }
       if (showAd.type === 'text') {
-        return `<span style='cursor:pointer' onclick='fetch(\\"${this.baseUrl + '/ad/visit/' + showAd._id}\\");window.open(\\"${showAd.link} \\")'>${showAd.text}</span>`;
+        return `<span style='cursor:pointer' onclick='fetch(\\"${this.baseUrl + '/ad/visit/' + showOrderId}\\");window.open(\\"${showAd.link} \\")'>${showAd.text}</span>`;
       } else if (showAd.type === 'image') {
-        return `<img src='${this.baseUrl + showAd.image.thumbUrl}' style='width:100%;cursor:pointer' onclick='window.open(\\"${showAd.link} \\"); fetch(\\"${this.baseUrl + '/ad/visit/' + showAd._id + '?site=' + adslot.site}\\");' />`;
+        return `<img src='${this.baseUrl + showAd.image.thumbUrl}' style='width:100%;cursor:pointer' onclick='window.open(\\"${showAd.link} \\"); fetch(\\"${this.baseUrl + '/ad/visit/' + showOrderId + '?site=' + adslot.site}\\");' />`;
       }
       noAd++;
       return '';
     };
     script = script.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
-    const ads = script.replace(/\<\%.*?\%\>/g, (match, key, value) => {
+    const ads = script.replace(/\<\%.*?\%\>/g, match => {
       const adIndex = match.replace(/\<\%/, '').replace(/\%\>/, '');
       if (isNaN(+adIndex)) {
         // 如果模板内出现关键字 'all', 则认为是遍历所有槽位
@@ -116,25 +118,28 @@ class HomeController extends Controller {
     let { ads, defaultAd } = adslot.toJSON();
     const now = new Date();
     ads.forEach((v, k) => {
-      for (let kk = 0; kk < v.ads.length; kk++) {
-        if (now > v.ads[kk].startDate && now < v.ads[kk].endDate) {
-          v.ad = v.ads[kk].ad;
-          break;
+      let checkAd = {};
+      _.forEach(v.ads || [], vv => {
+        if (now > vv.startDate && now < vv.endDate) {
+          checkAd = _.cloneDeep(vv);
+          return false;
         }
+      });
+      if (!checkAd.ad) {
+        checkAd.ad = defaultAd;
       }
-      if (!v.ad) {
-        v.ad = defaultAd;
-      }
-      if (v.ad) {
-        if (v.ad.type === 'image') {
-          v.ad = Object.assign({}, { image: this.baseUrl + v.ad.image.thumbUrl }, { link: v.ad.link }, { visit: this.baseUrl + '/ad/visit/' + v.ad._id });
+      console.log(checkAd);
+      if (checkAd.ad) {
+        if (checkAd.ad.type === 'image') {
+          checkAd.ad = Object.assign({}, { image: this.baseUrl + checkAd.ad.image.thumbUrl }, { link: checkAd.ad.link }, { visit: this.baseUrl + '/ad/visit/' + checkAd.order });
         } else {
-          v.ad = Object.assign({}, { text: v.ad.text }, { link: v.ad.link }, { visit: this.baseUrl + '/ad/visit/' + v.ad._id });
+          checkAd.ad = Object.assign({}, { text: checkAd.ad.text }, { link: checkAd.ad.link }, { visit: this.baseUrl + '/ad/visit/' + checkAd.order });
         }
         delete v.ads;
       } else {
         delete ads[k];
       }
+      v.ad = checkAd.ad;
     });
     ads = ads.filter(v => v);
 
@@ -153,13 +158,13 @@ class HomeController extends Controller {
   async visit() {
     const { ctx, service } = this;
     const { id } = ctx.params;
-    const data = await service.visit.create({
+    await service.visit.create({
       ip: ctx.request.header['x-forwarded-for'],
       origin: ctx.request.header.referer,
-      ad: id,
+      order: id,
       site: ctx.request.query.site,
     });
-    const data2 = await service.ad.incVisit(id, 1);
+    await service.order.incVisit(id, 1);
     ctx.status = 204;
     ctx.set({
       'Access-Control-Allow-Origin': '*',
