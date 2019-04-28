@@ -18,7 +18,7 @@ class AdslotService extends Service {
 
   async list(params) {
     params = JSON.parse(JSON.stringify(params));
-    const { ctx, app } = this,
+    const { app } = this,
       limit = +params.limit || 20,
       sort = params.sort || '_id',
       skip = +params.skip || 0;
@@ -34,6 +34,15 @@ class AdslotService extends Service {
     }
     if (params.site) {
       query.site = params.site;
+    }
+    if (params.type) {
+      query.type = { $in: params.type.split(',') };
+    }
+    if (params.imgWidth) {
+      query['size.imgWidth'] = { $in: [ 0, params.imgWidth ] };
+    }
+    if (params.imgHeight) {
+      query['size.imgHeight'] = { $in: [ 0, params.imgHeight ] };
     }
     const sites = await app.model.Adslot.find(query).skip(skip).limit(limit)
       .sort({ [sort]: -1 })
@@ -70,7 +79,7 @@ class AdslotService extends Service {
   }
 
   async update(id, params) {
-    const data = await this.app.model.Adslot.update({ _id: id }, params);
+    await this.app.model.Adslot.update({ _id: id }, params);
     const res = await this.app.model.Adslot.findOne({ _id: id }).populate('ads.ads.ad', 'name').populate('defaultAd', 'name');
     return res;
   }

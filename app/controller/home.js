@@ -158,13 +158,15 @@ class HomeController extends Controller {
   async visit() {
     const { ctx, service } = this;
     const { id } = ctx.params;
-    await service.visit.create({
-      ip: ctx.request.header['x-forwarded-for'],
-      origin: ctx.request.header.referer,
-      order: id,
-      site: ctx.request.query.site,
-    });
-    await service.order.incVisit(id, 1);
+    if (id) {
+      await service.visit.create({
+        ip: ctx.request.header['x-forwarded-for'],
+        origin: ctx.request.header.referer,
+        order: id,
+        site: ctx.request.query.site,
+      });
+      await service.order.incVisit(id, 1);
+    }
     ctx.status = 204;
     ctx.set({
       'Access-Control-Allow-Origin': '*',
