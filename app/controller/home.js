@@ -78,13 +78,13 @@ class HomeController extends Controller {
     const ads = script.replace(/\<\%.*?\%\>/g, match => {
       const adIndex = match.replace(/\<\%/, '').replace(/\%\>/, '');
       if (isNaN(+adIndex)) {
-        // 如果模板内出现关键字 'all', 则认为是遍历所有槽位
-        if (adIndex.includes('all')) {
+        // 如果模板内出现关键字 'ALL', 则认为是遍历所有槽位
+        if (adIndex.includes('ALL')) {
           return adslot.ads.map((v, k) => {
             return getIndexSlot(k) ?
               adIndex
                 // 将all替换为 k槽位的广告
-                .replace(/all/g, getIndexSlot(k))
+                .replace(/ALL/g, getIndexSlot(k))
                 // 将 NAME 替换为 k槽位的名称
                 .replace(/NAME/g, v.name)
                 // 将 INDEX 替换为 k槽位的序号
