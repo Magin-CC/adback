@@ -15,14 +15,14 @@ class OrderController extends Controller {
     const userInfo = ctx.session.user;
     const res = await ctx.service.order.createOrder(ctx.request.body);
     if (userInfo.email) {
-      app.email.sendEmail('【网络医院广告系统】广告已提交',
+      await app.email.sendEmail('【网络医院广告系统】广告已提交',
         '信息：' + ctx.helper.getOrderText(res),
         userInfo.email);
     }
     const adminList = await ctx.service.user.listAdmin();
-    _.each(adminList, v => {
+    _.each(adminList, async v => {
       if (v.email) {
-        app.email.sendEmail('【网络医院广告系统】收到新的广告上线申请',
+        await app.email.sendEmail('【网络医院广告系统】收到新的广告上线申请',
           `${userInfo.username} 申请上线：  ${ctx.helper.getOrderText(res)}`,
           v.email);
       }
