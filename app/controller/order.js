@@ -20,7 +20,7 @@ class OrderController extends Controller {
         userInfo.email);
     }
     const adminList = await ctx.service.user.listAdmin();
-    _.each(adminList, async v => {
+    await _.each(adminList, async v => {
       if (v.email) {
         await app.email.sendEmail('【网络医院广告系统】收到新的广告上线申请',
           `${userInfo.username} 申请上线：  ${ctx.helper.getOrderText(res)}`,
