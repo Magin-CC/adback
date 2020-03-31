@@ -7,6 +7,11 @@ const sendToWormhole = require('stream-wormhole');
 const _ = require('lodash');
 
 class ContractController extends Controller {
+  constructor(props) {
+    super(props);
+    this.contractPwd = this.ctx.app.config.env === 'prod' ? path.join('/', 'home', 'upload', 'contract') : path.join(this.config.baseDir, 'app/public/contract/');
+    this.schedulePwd = this.ctx.app.config.env === 'prod' ? path.join('/', 'home', 'upload', 'schedule') : path.join(this.config.baseDir, 'app/public/schedule/');
+  }
   async index() {
     const { ctx } = this;
     const res = await ctx.service.contract.list(ctx.queries);
@@ -44,13 +49,13 @@ class ContractController extends Controller {
             (new Date()).valueOf().toString()
               .slice(-4));
           filename = filenameChunk.join('-');
-          const target = path.join(this.config.baseDir, 'app/public/contract/', filename);
+          const target = path.join(this.contractPwd, filename);
           const targetStream = fs.createWriteStream(target);
           await pump(part, targetStream);
           contractName = filename;
         } else if (part.fieldname === 'schedule') {
           filename = (new Date()).valueOf() + '-' + filename;
-          const target = path.join(this.config.baseDir, 'app/public/schedule/', filename);
+          const target = path.join(this.schedulePwd, filename);
           const targetStream = fs.createWriteStream(target);
           await pump(part, targetStream);
           scheduleName = filename;
@@ -89,17 +94,6 @@ class ContractController extends Controller {
       sendToWormhole(part);
     }
 
-    // const stream = await ctx.getFileStream();
-    // let filename = stream.filename;
-    // const filenameChunk = filename.split('-');
-    // const contractNo = filenameChunk[0];
-    // filenameChunk.splice(1, 0,
-    //   (new Date()).valueOf().toString()
-    //     .slice(-4));
-    // filename = filenameChunk.join('-');
-    // const target = path.join(this.config.baseDir, 'app/public/contract/', filename);
-    // const targetStream = fs.createWriteStream(target);
-    // await pump(stream, targetStream);
     const data = {
       number,
       contractName,

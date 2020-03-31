@@ -5,7 +5,8 @@ const moment = require('moment');
 
 module.exports = {
   getImageSize(imgUrl) {
-    const target = path.join('app/public', imgUrl);
+    // const target = path.join('app/public', imgUrl);
+    const target = imgUrl;
     const size = imageSize(target);
     const data = {};
     data.width = size.width;

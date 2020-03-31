@@ -16,6 +16,7 @@ class HomeController extends Controller {
     super(props);
     this.baseUrl = this.ctx.app.config.env === 'prod' ?
       'https://guahao.zjol.com.cn' : 'http://localhost:7001';
+    this.uploadPwd = this.ctx.app.config.env === 'prod' ? path.join('/', 'home', 'upload') : path.join(this.config.baseDir, 'app/public');
   }
   async index() {
     this.ctx.body = 'hi, egg';
@@ -35,7 +36,7 @@ class HomeController extends Controller {
   async upload() {
     const stream = await this.ctx.getFileStream();
     const filename = (new Date()).valueOf() + '.jpg';
-    const target = path.join(this.config.baseDir, 'app/public', filename);
+    const target = path.join(this.uploadPwd, filename);
     const writeStream = fs.createWriteStream(target);
     await pump(stream, writeStream);
     // const size = this.ctx.helper.getImageSize(filename);
@@ -158,7 +159,7 @@ class HomeController extends Controller {
   async visit() {
     const { ctx, service } = this;
     const { id } = ctx.params;
-    if (id) {
+    if (id && (id !== 'undefined')) {
       await service.visit.create({
         ip: ctx.request.header['x-forwarded-for'],
         origin: ctx.request.header.referer,

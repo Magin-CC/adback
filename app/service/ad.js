@@ -1,6 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
+const path = require('path');
 
 const createRule = {
   name: 'string',
@@ -8,7 +9,12 @@ const createRule = {
 };
 
 class AdService extends Service {
-
+  constructor(props) {
+    super(props);
+    this.baseUrl = this.ctx.app.config.env === 'prod' ?
+      'https://guahao.zjol.com.cn' : 'http://localhost:7001';
+    this.uploadPwd = this.ctx.app.config.env === 'prod' ? path.join('/', 'home', 'upload') : path.join(this.config.baseDir, 'app/public');
+  }
   async create(params) {
     const { ctx, app } = this;
     ctx.validate(createRule, params);
@@ -48,7 +54,7 @@ class AdService extends Service {
     sites.forEach(v => {
       if (!v.imageSize && v.image && v.image.thumbUrl) {
         try {
-          v.imageSize = ctx.helper.getImageSize(v.image.thumbUrl.split('/').slice(-1)[0]);
+          v.imageSize = ctx.helper.getImageSize(path.join(this.uploadPwd, v.image.thumbUrl.split('/').slice(-1)[0]));
         } catch (e) {
           console.log('cant find img');
         }
