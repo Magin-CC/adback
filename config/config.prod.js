@@ -14,5 +14,8 @@ module.exports = () => {
       useNewUrlParser: true,
     },
   };
+  config.session = {
+    renew: true,
+  };
   return config;
 };

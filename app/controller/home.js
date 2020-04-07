@@ -7,10 +7,6 @@ const moment = require('moment');
 const pump = require('mz-modules/pump');
 const _ = require('lodash');
 
-const loginRule = {
-  username: 'string',
-  password: 'string',
-};
 class HomeController extends Controller {
   constructor(props) {
     super(props);
@@ -20,18 +16,6 @@ class HomeController extends Controller {
   }
   async index() {
     this.ctx.body = 'hi, egg';
-  }
-  async login() {
-    const { ctx, service } = this;
-    const { username, password } = ctx.request.body;
-    ctx.validate(loginRule, ctx.request.body);
-    const user = await service.user.checkUser(username, password);
-    delete user.password;
-    ctx.session.user = user;
-    ctx.body = {
-      status: 0,
-      detail: user,
-    };
   }
   async upload() {
     const stream = await this.ctx.getFileStream();
@@ -43,8 +27,21 @@ class HomeController extends Controller {
     this.ctx.body = { status: 0, message: filename /** size */ };
   }
   async script() {
-    const { ctx, service } = this;
+    const { ctx, service, app } = this;
     const { id } = ctx.params;
+    const cacheAd = await app.redis.get(`SCRIPT_${id}`);
+    if (cacheAd) {
+      ctx.body = cacheAd;
+      ctx.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+        'Access-Control-Expose-Headers': '*',
+        'Cache-Control': 'no-cache',
+      });
+      ctx.set('content-type', 'application/x-javascript;charset=UTF-8');
+      return;
+    }
+    console.log(`${id}没有缓存`);
     const adslot = await service.adslot.findOne(id);
     let noAd = 0; // 无广告的广告位的数量，当noAd === 广告位数量时，输出空字符串
     let { script } = adslot;
@@ -100,10 +97,12 @@ class HomeController extends Controller {
       }
       return getIndexSlot(adIndex);
     });
-    ctx.body = noAd === adslot.ads.length ? '' : `(function(){
+    const _ad = noAd === adslot.ads.length ? '' : `(function(){
       const signTime=(new Date()).valueOf();
       ${ads}
     }())`;
+    app.redis.set(`SCRIPT_${id}`, _ad, 'EX', 60 * 60);
+    ctx.body = _ad;
     ctx.set({
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,

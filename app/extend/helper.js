@@ -1,6 +1,6 @@
 'use strict';
 const imageSize = require('image-size');
-const path = require('path');
+// const path = require('path');
 const moment = require('moment');
 
 module.exports = {

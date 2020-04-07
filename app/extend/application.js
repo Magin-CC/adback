@@ -11,4 +11,5 @@ module.exports = {
     const image = fs.readFileSync(filePath).toString('base64');
     return client.generalBasic(image, { detect_direction: true });
   },
+
 };

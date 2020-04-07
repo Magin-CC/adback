@@ -5,15 +5,19 @@
  */
 module.exports = app => {
   const { router, controller, middleware } = app;
-  const authCheck = middleware.authCheck();
+  const authCheck = middleware.authCheck(0);
+  // const devCheck = middleware.authCheck(1);
+  // const rootCheck = middleware.authCheck(2);
+
   router.get('/', controller.home.index);
 
   router.get('/ad/adHtml/:id', controller.home.script);
   router.get('/ad/adJson/:id', controller.home.scriptByData);
   router.get('/ad/visit/:id', controller.home.visit);
 
-  router.post('/ad/api/v1/login', controller.home.login);
-  router.post('/ad/api/v1/upload', controller.home.upload);
+  router.post('/ad/api/v1/login', controller.user.login);
+  router.get('/ad/api/v1/loginCaptcha', controller.user.loginCaptcha);
+  router.post('/ad/api/v1/upload', authCheck, controller.home.upload);
   app.router.resources('user', '/ad/api/v1/user', authCheck, app.controller.user);
   app.router.resources('site', '/ad/api/v1/site', authCheck, app.controller.site);
   app.router.resources('ad', '/ad/api/v1/ad', authCheck, app.controller.ad);

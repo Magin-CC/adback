@@ -50,12 +50,39 @@ module.exports = appInfo => {
     prefix: '/ad/public',
   };
 
+  // config.email = {
+  //   username: 'wlyyconfluence@163.com',
+  //   password: 'wlyy123456',
+  //   host: 'smtp.163.com',
+  //   sender: 'wlyyconfluence@163.com',
+  // };
   config.email = {
-    username: 'wlyyconfluence@163.com',
-    password: 'wlyy123456',
-    host: 'smtp.163.com',
-    sender: 'wlyyconfluence@163.com',
+    username: 'wangchao1',
+    // password: 'KyT2GIxE2WypRaxN',
+    password: 'wangchao931124',
+    host: 'smtp.8531.cn',
+    sender: 'wangchao1',
   };
 
+  config.redis = {
+    client: {
+      host: '127.0.0.1',
+      port: '6379',
+      password: '',
+      db: 4,
+    },
+    agent: true,
+  };
+
+  config.session = {
+    key: 'AD_SYS',
+    maxAge: 24 * 3600 * 1000, // 1 天
+    httpOnly: true,
+    encrypt: true,
+  };
+
+  // config.sessionRedis = {
+  //   name: 'AD_SYS_SEESION', // specific instance `session` as the session store
+  // };
   return config;
 };
